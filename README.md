@@ -56,6 +56,7 @@ WHERE rank_search < 25
   AND ST_GeometryType(placex.geometry) IN ('ST_Polygon', 'ST_MultiPolygon');
 ```
 
+```
  rank_search |  count
 -------------+---------
            2 |       63
@@ -82,6 +83,7 @@ WHERE rank_search < 25
           27 |    34801
           28 |      396
           30 | 99555017
+```
 
 ### Processing time
 
@@ -90,13 +92,14 @@ extend, then group them by their importance. Each layer is then written
 to a temporary table. The temporary table is then merged into a single
 layer by looking at the highest pixel value.
 
+```
 tile size | time  | tiles  | with country | no places in tile
 ----------+-------+--------+--------------+-------------------
 50x50     | 2:52h | 107584 |        33450 |             10051
 100x100   | 1:57h |  26896 |         9191 |              2039
 200x200   | 2:18h |   6724 |         2684 |               459
 400x400   | 3:42h |   1681 |          812 |               140
-
+```
 
 ### Output
 
