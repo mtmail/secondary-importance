@@ -112,6 +112,14 @@ tile size | time  | tiles  | with country | no places in tile
 ![img-world.jpg](img-world.jpg)
 ![img-uk.jpg](img-uk.jpg)
 
+## Development
+
+You can check the size of a pixel with the
+https://tools.geofabrik.de/map/?type=Geofabrik_Standard&grid=1#14/69.6486/18.9507
+tool.
+
+
+
 ## Further optimization
 
 * It should be possible to exclude more tiles from processing. We
