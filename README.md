@@ -4,7 +4,7 @@
 of a so called 'secondary_importance' raster table for ranking results. See
 [Importance in the Nominatim documentation](https://nominatim.org/release-docs/latest/customize/Importance).
 
-This respository creates such a file.
+This repository creates such a file.
 
 ## Overview
 
