@@ -15,7 +15,10 @@ BEGIN
         COUNT(placex.*) as num_places,
         ST_AsRaster(
           ST_Intersection(
-            ST_Union(placex.geometry),
+            ST_Union(
+                CASE WHEN osm_type = 'N' THEN ST_Buffer(centroid, reverse_place_diameter(rank_search))
+                ELSE placex.geometry END
+            ),
             ST_Envelope(sip_tiles.rast)
           ),
           sip_tiles.rast, -- existing raster from which to copy the specs
@@ -23,10 +26,26 @@ BEGIN
           ROUND(COALESCE(importance, round(0.40001 - (rank_search::numeric / 75), 3)) * ((rank_address + 2) / 15) * 65536)
         ) as rast_this_importance
       FROM placex, sip_tiles
-      WHERE ST_Intersects(sip_tiles.rast, placex.geometry)
+      WHERE
+        ST_Intersects(
+            sip_tiles.rast,
+            CASE WHEN osm_type = 'N' THEN ST_Buffer(centroid, reverse_place_diameter(rank_search))
+            ELSE placex.geometry END
+        )
         AND sip_tiles.id = tile_id
-        AND placex.rank_search < 25
-        AND ST_GeometryType(placex.geometry) IN ('ST_Polygon', 'ST_MultiPolygon')
+        AND (
+                (
+                    ST_GeometryType(placex.geometry) IN ('ST_Polygon', 'ST_MultiPolygon')
+                    AND
+                    (placex.rank_address BETWEEN 2 AND 24)
+                )
+                OR
+                (
+                    osm_type = 'N'
+                    AND
+                    (placex.rank_address BETWEEN 13 and 24)
+                )
+            )
         AND ROUND(COALESCE(importance, round(0.40001 - (rank_search::numeric / 75), 3)) * ((rank_address + 2) / 15) * 65536) > 0
       GROUP BY sip_tiles.rast, sec_importance
       ORDER BY sec_importance;
