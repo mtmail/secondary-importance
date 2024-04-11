@@ -27,10 +27,13 @@ BEGIN
         ) as rast_this_importance
       FROM placex, sip_tiles
       WHERE
-        ST_Intersects(
-            sip_tiles.rast,
-            CASE WHEN osm_type = 'N' THEN ST_Buffer(centroid, reverse_place_diameter(rank_search))
-            ELSE placex.geometry END
+        (
+            ST_Intersects(sip_tiles.rast, placex.geometry)
+            or (rank_address >= 4 AND rank_address <= 25
+                AND type <> 'postcode'::text AND name IS NOT NULL
+                AND linked_place_id IS NULL AND osm_type = 'N'
+                AND ST_Intersects(sip_tiles.rast, ST_Buffer(centroid, reverse_place_diameter(rank_search)))
+            )
         )
         AND sip_tiles.id = tile_id
         AND (
